@@ -1,8 +1,10 @@
 # WebTimer
 A minimalist, responsive countdown timer for the browser with extensive customization options.
 
-![WebTimer Screenshot](screenshots/webtimer-main.png)
-![WebTimer Screenshot](screenshots/webtimer-main-colors.png)
+<p align="center">
+  <img src="screenshots/webtimer-main.png" alt="WebTimer Screenshot" width="45%" />
+  <img src="screenshots/webtimer-main-colors.png" alt="WebTimer Screenshot with colors" width="45%" />
+</p>
 
 ## Features
 
@@ -19,7 +21,9 @@ A minimalist, responsive countdown timer for the browser with extensive customiz
 - **Text Color**: Customize the text color to your preference
 - **Font Size**: Adjust the size of the timer display individually
 
-![Timer Controls](screenshots/timer-controls-settings.png)
+<p align="center">
+  <img src="screenshots/timer-controls-settings.png" alt="Timer Controls and Settings" width="60%" />
+</p>
 
 ### User Interface
 - **Responsive Design**: Optimized for all screen sizes - from smartphone to desktop
@@ -27,8 +31,10 @@ A minimalist, responsive countdown timer for the browser with extensive customiz
 - **Auto-Hide Controls**: Controls automatically hide when the timer is running and reappear on mouse movement
 - **Real-Time Updates**: All changes in the settings are displayed instantly in the preview
 
-![Responsive for small screens](screenshots/mobile.png)
-![Responsive for small screens](screenshots/mobile-controls-settings.png)
+<p align="center">
+  <img src="screenshots/mobile.png" alt="Responsive for small screens" width="30%" />
+  <img src="screenshots/mobile-controls-settings.png" alt="Mobile with controls and settings" width="30%" />
+</p>
 
 ## Usage
 
@@ -64,18 +70,28 @@ For more details, see the [LICENSE](LICENSE) file or visit https://www.gnu.org/l
 
 ## Screenshot Overview
 
-### Main View
-![Main View](screenshots/webtimer-main.png)
-*The timer in action with custom text*
+<p align="center">
+  <img src="screenshots/webtimer-main.png" alt="Main View" width="45%" />
+  <img src="screenshots/webtimer-main-colors.png" alt="Main View with custom colors" width="45%" />
+</p>
+<p align="center">
+  <em>The timer in action with custom text and color variations</em>
+</p>
 
-### Control Elements and Settings Panel
-![Settings](screenshots/timer-controls-settings.png)
-*Start, Pause, and Reset buttons*
-*All customization options at a glance*
+<p align="center">
+  <img src="screenshots/timer-controls-settings.png" alt="Controls and Settings" width="60%" />
+</p>
+<p align="center">
+  <em>Start, Pause, and Reset buttons with all customization options</em>
+</p>
 
-### Presentation on Mobile Device
-![Fullscreen](screenshots/mobile.png)
-*Timer in mobile device for presentations*
+<p align="center">
+  <img src="screenshots/mobile.png" alt="Mobile View" width="30%" />
+  <img src="screenshots/mobile-controls-settings.png" alt="Mobile with Settings" width="30%" />
+</p>
+<p align="center">
+  <em>Timer optimized for mobile devices and presentations</em>
+</p>
 
 ## Contributions
 
