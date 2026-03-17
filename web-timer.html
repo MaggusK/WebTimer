@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebTimer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            height: 100vh;
+            margin: 0;
+            padding: 1vh;
+            background-color: #282c34;
+            color: white;
+            font-size: clamp(10px, 1.5vh, 16px);
+            transition: background-color 0.5s, color 0.5s;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .fade-out {
+            animation: fadeOut 3s forwards;
+        }
+        @keyframes fadeOut {
+            to {
+                background-color: black;
+                color: black;
+            }
+        }
+
+        #additionalText {
+            font-size: clamp(16px, 5vh, 80px);
+            text-align: center;
+            margin-bottom: 1vh;
+            max-width: 95vw;
+            word-wrap: break-word;
+        }
+
+        #timerDisplay {
+            font-family: 'Xanh Mono', monospace;
+            font-size: clamp(40px, 15vh, 200px);
+            text-align: center;
+            margin-bottom: 2vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #control-box {
+            transition: opacity 0.5s;
+            width: 100%;
+            max-width: min(600px, 95vw);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1vh;
+        }
+
+        #control-box.visible {
+            opacity: 1;
+        }
+
+        #control-box:not(.visible) {
+            opacity: 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: clamp(5px, 1vw, 15px);
+            justify-content: center;
+            flex-wrap: wrap;
+            transition: opacity 0.5s;
+        }
+
+        .controls button {
+            padding: clamp(5px, 1vh, 10px) clamp(10px, 2vw, 20px);
+            font-size: clamp(12px, 1.5vh, 16px);
+            cursor: pointer;
+            background-color: #4a5568;
+            color: white;
+            border: 1px solid #ffffff;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .controls button:hover {
+            background-color: #5a6678;
+        }
+
+        .settings {
+            background-color: rgb(72, 79, 94);
+            border: 1px solid #ffffff;
+            border-radius: 5px;
+            padding: clamp(8px, 1.5vh, 15px);
+            color: #ffffff;
+            font-family: Helvetica, Arial, sans-serif;
+            width: 100%;
+            max-height: 40vh;
+            overflow-y: auto;
+        }
+
+        .setting {
+            display: flex;
+            align-items: center;
+            margin: clamp(3px, 0.5vh, 8px) 0;
+            font-size: clamp(11px, 1.5vh, 14px);
+            gap: clamp(5px, 1vw, 10px);
+            flex-wrap: wrap;
+        }
+
+        .setting label {
+            min-width: clamp(120px, 30%, 190px);
+            flex-shrink: 0;
+        }
+
+        .setting input[type="text"],
+        .setting input[type="number"] {
+            padding: clamp(3px, 0.5vh, 6px);
+            font-size: clamp(11px, 1.5vh, 14px);
+            border: 1px solid #ffffff;
+            border-radius: 3px;
+            background-color: #5a6678;
+            color: white;
+        }
+
+        #customText {
+            flex: 1;
+            min-width: clamp(150px, 40%, 300px);
+            max-width: 100%;
+        }
+
+        #minutesInput, #secondsInput, #fontSize {
+            width: clamp(50px, 10vw, 70px);
+        }
+
+        #bgColor, #textColor {
+            width: clamp(50px, 10vw, 70px);
+            height: clamp(25px, 3vh, 35px);
+            padding: 2px;
+            border: 1px solid #ffffff;
+            border-radius: 3px;
+            background-color: #5a6678;
+            cursor: pointer;
+        }
+
+        /* Responsive for smaller screens */
+        @media (max-height: 600px) {
+            #additionalText {
+                font-size: clamp(14px, 4vh, 60px);
+                margin-bottom: 0.5vh;
+            }
+
+            #timerDisplay {
+                font-size: clamp(30px, 12vh, 150px);
+                margin-bottom: 1vh;
+            }
+
+            .settings {
+                max-height: 30vh;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .setting {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .setting label {
+                width: 100%;
+            }
+
+            #customText {
+                width: 100%;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Xanh+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="additionalText">gleich gehts weiter...</div>
+    <div id="timerDisplay"><span id="timerText">00:00</span></div>
+    <div id="control-box">
+      <div class="controls" id="controls">
+          <button id="start-button" onclick="startTimer()">Start</button>
+          <button id="pause-button" onclick="pauseTimer()">Pause</button>
+          <button onclick="resetTimer()">Zurücksetzen</button>
+      </div>
+      <div class="settings" id="settings">
+          <div class="setting">
+              <label for="minutesInput">Zeit:</label>
+              <input type="number" id="minutesInput" min="0" placeholder="Min" onchange="updateDisplay()" />
+              <input type="number" id="secondsInput" min="0" max="59" placeholder="Sek" onchange="updateDisplay()" />
+          </div>
+          <div class="setting">
+              <label for="customText">Zusätzlicher Text:</label>
+              <input type="text" id="customText" value="gleich gehts weiter..." placeholder="Zusätzlicher Text" onchange="updateDisplay()" />
+          </div>
+          <div class="setting">
+              <label for="bgColor">Hintergrundfarbe:</label>
+              <input type="color" id="bgColor" value="#282c34" onchange="updateDisplay()" />
+          </div>
+          <div class="setting">
+              <label for="textColor">Schriftfarbe:</label>
+              <input type="color" id="textColor" value="#cdcdcd" onchange="updateDisplay()" />
+          </div>
+          <div class="setting">
+              <label for="fontSize">Schriftgröße:</label>
+              <input type="number" id="fontSize" value="200" placeholder="Schriftgröße" onchange="updateDisplay()" />
+          </div>
+      </div>
+    </div>
+
+    <script>
+        let timer;
+        let timeLeft;
+        let isRunning = false;
+        let isPaused = false;
+
+        const controlBox = document.getElementById('control-box');
+        const pauseButton = document.getElementById('pause-button');
+
+        // Zeige die Bedienelemente und Einstellungen bei Mouseover
+        controlBox.addEventListener('mouseover', () => {
+            controlBox.classList.add('visible');
+        });
+
+        // Verstecke die Bedienelemente und Einstellungen bei Mouseleave
+        controlBox.addEventListener('mouseleave', () => {
+            if (isRunning) {
+                controlBox.classList.remove('visible');
+            }
+        });
+
+        function startTimer() {
+            if (isRunning) return;
+
+            const minutes = parseInt(document.getElementById('minutesInput').value) || 0;
+            const seconds = parseInt(document.getElementById('secondsInput').value) || 0;
+            const totalTime = (minutes * 60) + seconds;
+            
+            if (totalTime <= 0) return;
+
+            timeLeft = totalTime; 
+
+            isRunning = true;
+            isPaused = false;
+            pauseButton.textContent = 'Pause';
+            updateDisplay();
+
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    timeLeft--;
+                    updateDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        document.body.classList.add('fade-out');
+                    }
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            if (isPaused) {
+                isPaused = false;
+                pauseButton.textContent = 'Pause';
+            } else {
+                isPaused = true;
+                pauseButton.textContent = 'Weiter';
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            timeLeft = 0;
+            pauseButton.textContent = 'Pause';
+            updateDisplay();
+            document.body.classList.remove('fade-out');
+            controlBox.classList.add('visible');
+        }
+
+        function updateDisplay() {
+            // Zeige die verbleibende Zeit an, wenn der Timer läuft
+            if (isRunning) {
+                const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+                const seconds = String(timeLeft % 60).padStart(2, '0');
+                document.getElementById('timerText').textContent = `${minutes}:${seconds}`;
+            } else {
+                // Wenn der Timer nicht läuft, zeige die Zeit aus den Inputs an
+                const inputMinutes = parseInt(document.getElementById('minutesInput').value) || 0;
+                const inputSeconds = parseInt(document.getElementById('secondsInput').value) || 0;
+                const displayMinutes = String(inputMinutes).padStart(2, '0');
+                const displaySeconds = String(inputSeconds).padStart(2, '0');
+                document.getElementById('timerText').textContent = `${displayMinutes}:${displaySeconds}`;
+            }
+
+            document.getElementById('additionalText').textContent = document.getElementById('customText').value;
+
+            // Setze die Schriftgröße basierend auf dem Input, aber responsive
+            const fontSize = parseInt(document.getElementById('fontSize').value) || 150;
+            const viewportFactor = Math.min(window.innerHeight, window.innerWidth) / 1000;
+
+            // Timer-Schriftgröße: Benutzerwert * viewport-Faktor mit Grenzen
+            const timerSize = Math.max(40, Math.min(fontSize * viewportFactor, window.innerHeight * 0.3));
+            document.getElementById('timerDisplay').style.fontSize = timerSize + 'px';
+
+            // Zusatztext-Schriftgröße: Hälfte der Timer-Größe
+            const textSize = Math.max(16, Math.min(timerSize / 2, window.innerHeight * 0.15));
+            document.getElementById('additionalText').style.fontSize = textSize + 'px';
+
+            // Setze die Farben
+            document.body.style.backgroundColor = document.getElementById('bgColor').value;
+            document.body.style.color = document.getElementById('textColor').value;
+        }
+
+        // Zeige die Bedienelemente beim Laden der Seite an
+        document.addEventListener('DOMContentLoaded', () => {
+            controlBox.classList.add('visible');
+            updateDisplay();
+        });
+
+        // Aktualisiere die Anzeige bei Fenstergrößenänderung
+        window.addEventListener('resize', () => {
+            updateDisplay();
+        });
+    </script>
+</body>
+</html>
+
