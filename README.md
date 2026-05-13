@@ -96,21 +96,6 @@ This means:
 
 For more details, see the [LICENSE](LICENSE) file or visit https://www.gnu.org/licenses/gpl-3.0.html
 
-## Comparison with Analog WebTimer
-
-| Feature | WebTimer | Analog WebTimer |
-|---------|----------|-----------------|
-| Display | Digital (MM:SS) | Analog (Ring Chart) |
-| Time Input | Minutes & Seconds | Slider (3-30 min) |
-| Update Frequency | Every second | Every second |
-| Visual Style | Numeric | Clock-style ring graphic |
-| Time Selection | Manual input + wheel | Interactive slider + wheel support |
-| Theme Previews | ✓ 4 themes | ✓ 4 themes |
-| Background Animations | ✓ 3 animations | ✓ 3 animations |
-| Settings Persistence | ✓ LocalStorage | ✓ LocalStorage |
-| Language Support | ✓ DE/EN | ✓ DE/EN |
-| Use Case | Precise timing | Visual at-a-glance timing |
-
 ## Screenshot Overview
 
 <p align="center">
