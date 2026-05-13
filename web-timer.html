@@ -5,22 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebTimer</title>
     <style>
+        :root {
+            --animation-size: 20px;
+        }
+
         * {
             box-sizing: border-box;
         }
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             height: 100vh;
             margin: 0;
-            padding: 1vh;
+            padding: 0;
             background-color: #282c34;
             color: white;
             font-size: clamp(10px, 1.5vh, 16px);
             transition: background-color 0.5s, color 0.5s;
-            flex-direction: column;
             overflow: hidden;
         }
         .fade-out {
@@ -30,6 +33,15 @@
             to {
                 background-color: black;
                 color: black;
+            }
+        }
+
+        .fade-out #backgroundAnimation {
+            animation: fadeOutBackground 3s forwards;
+        }
+        @keyframes fadeOutBackground {
+            to {
+                opacity: 0;
             }
         }
 
@@ -52,21 +64,21 @@
         }
 
         #control-box {
+            position: fixed;
+            bottom: 1vh;
+            right: 1vw;
             transition: opacity 0.5s;
-            width: 100%;
-            max-width: min(600px, 95vw);
+            width: auto;
+            max-width: min(600px, 45vw);
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-end;
             gap: 1vh;
+            opacity: 0;
         }
 
         #control-box.visible {
             opacity: 1;
-        }
-
-        #control-box:not(.visible) {
-            opacity: 0;
         }
 
         .controls {
@@ -74,7 +86,6 @@
             gap: clamp(5px, 1vw, 15px);
             justify-content: center;
             flex-wrap: wrap;
-            transition: opacity 0.5s;
         }
 
         .controls button {
@@ -83,7 +94,7 @@
             cursor: pointer;
             background-color: #4a5568;
             color: white;
-            border: 1px solid #ffffff;
+            border: 1px solid #fff;
             border-radius: 5px;
             transition: background-color 0.3s;
         }
@@ -93,13 +104,15 @@
         }
 
         .settings {
-            background-color: rgb(72, 79, 94);
-            border: 1px solid #ffffff;
+            background-color: #484f5e;
+            border: 1px solid #fff;
             border-radius: 5px;
             padding: clamp(8px, 1.5vh, 15px);
-            color: #ffffff;
+            color: white;
             font-family: Helvetica, Arial, sans-serif;
-            width: 100%;
+            width: max-content;
+            min-width: 300px;
+            max-width: min(600px, 45vw);
             max-height: 40vh;
             overflow-y: auto;
         }
@@ -119,13 +132,19 @@
         }
 
         .setting input[type="text"],
-        .setting input[type="number"] {
+        .setting input[type="number"],
+        .setting select {
             padding: clamp(3px, 0.5vh, 6px);
             font-size: clamp(11px, 1.5vh, 14px);
-            border: 1px solid #ffffff;
+            border: 1px solid #fff;
             border-radius: 3px;
             background-color: #5a6678;
             color: white;
+        }
+
+        .setting select {
+            cursor: pointer;
+            min-width: clamp(100px, 15vw, 150px);
         }
 
         #customText {
@@ -142,10 +161,64 @@
             width: clamp(50px, 10vw, 70px);
             height: clamp(25px, 3vh, 35px);
             padding: 2px;
-            border: 1px solid #ffffff;
+            border: 1px solid #fff;
             border-radius: 3px;
             background-color: #5a6678;
             cursor: pointer;
+        }
+
+        .color-settings {
+            display: flex;
+            gap: clamp(5px, 1vw, 10px);
+            align-items: stretch;
+            flex-wrap: wrap;
+        }
+
+        .color-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(3px, 0.5vh, 8px);
+        }
+
+        .theme-previews {
+            display: flex;
+            gap: clamp(5px, 1vw, 10px);
+            flex-wrap: wrap;
+        }
+
+        .theme-preview {
+            width: clamp(50px, 10vw, 70px);
+            height: clamp(53px, 6.5vh, 78px);
+            border: 1px solid #fff;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(6px, 0.8vh, 8px);
+            line-height: 1.2;
+            padding: 2px;
+            transition: transform 0.2s;
+            font-family: 'Xanh Mono', monospace;
+        }
+
+        .theme-preview:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-preview .preview-text {
+            font-size: clamp(4px, 0.6vh, 6px);
+            text-align: center;
+            margin-bottom: 1px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        .theme-preview .preview-time {
+            font-weight: bold;
         }
 
         /* Responsive for smaller screens */
@@ -160,12 +233,25 @@
                 margin-bottom: 1vh;
             }
 
+            #control-box {
+                bottom: 0.5vh;
+            }
+
             .settings {
                 max-height: 30vh;
             }
         }
 
         @media (max-width: 600px) {
+            #control-box {
+                max-width: 90vw;
+            }
+
+            .settings {
+                min-width: auto;
+                max-width: 90vw;
+            }
+
             .setting {
                 flex-direction: column;
                 align-items: flex-start;
@@ -179,58 +265,276 @@
                 width: 100%;
             }
         }
+
+        #backgroundAnimation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 1s;
+            pointer-events: none;
+        }
+
+        #backgroundAnimation.active {
+            opacity: 1;
+        }
+
+        /* Animation: Flicker Gradient */
+        #backgroundAnimation.anim-flicker {
+            background: conic-gradient(from 180deg at 50% 70%, hsla(0,0%,98%,1) 0deg, #eec32d 72deg, #ec4b4b 144deg, #709ab9 216deg, #4dffbf 288deg, hsla(0,0%,98%,1) 1turn);
+            mask:
+                radial-gradient(circle at 50% 50%, white 2px, transparent 2.5px) 50% 50% / var(--animation-size) var(--animation-size),
+                url("https://assets.codepen.io/605876/noise-mask.png") 256px 50% / 256px 256px;
+            mask-composite: intersect;
+            animation: flicker 20s infinite linear;
+        }
+
+        @keyframes flicker {
+            to {
+                mask-position: 50% 50%, 0 50%;
+            }
+        }
+
+        /* Animation: Gradient Wave */
+        #backgroundAnimation.anim-gradient {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 60s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Animation: Blob Gradient */
+        #backgroundAnimation.anim-blob {
+            background-color: #071c39;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #backgroundAnimation.anim-blob .gradient {
+            --size: 750px;
+            --speed: 20s;
+            --easing: cubic-bezier(0.8, 0.2, 0.2, 0.8);
+            width: var(--size);
+            height: var(--size);
+            filter: blur(calc(var(--size) / 5));
+            background-image: linear-gradient(hsl(222, 84%, 60%), hsl(164, 79%, 71%));
+            animation: rotate var(--speed) var(--easing) alternate infinite;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            transition: all 0.5s ease-out;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (min-width: 720px) {
+            #backgroundAnimation.anim-blob .gradient {
+                --size: 500px;
+            }
+        }
+
+        #progressBar {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            height: 3px;
+            width: 100%;
+            background-color: currentColor;
+            transition: width 0.3s linear;
+            opacity: 0;
+        }
+
+        #progressBar.active {
+            opacity: 1;
+        }
+
+        .github-link {
+            font-size: clamp(8px, 1vh, 10px);
+            opacity: 0.7;
+            margin-top: 0.5vh;
+            text-align: right;
+        }
+
+        .github-link a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .github-link a:hover {
+            text-decoration: underline;
+        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Xanh+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="additionalText">gleich gehts weiter...</div>
+    <div id="backgroundAnimation"></div>
+    <div id="additionalText"></div>
     <div id="timerDisplay"><span id="timerText">00:00</span></div>
     <div id="control-box">
-      <div class="controls" id="controls">
-          <button id="start-button" onclick="startTimer()">Start</button>
-          <button id="pause-button" onclick="pauseTimer()">Pause</button>
-          <button onclick="resetTimer()">Zurücksetzen</button>
+      <div class="controls">
+          <button onclick="startTimer()"></button>
+          <button id="pause-button" onclick="pauseTimer()"></button>
+          <button onclick="resetTimer()"></button>
       </div>
-      <div class="settings" id="settings">
+      <div class="settings">
           <div class="setting">
-              <label for="minutesInput">Zeit:</label>
-              <input type="number" id="minutesInput" min="0" placeholder="Min" onchange="updateDisplay()" />
-              <input type="number" id="secondsInput" min="0" max="59" placeholder="Sek" onchange="updateDisplay()" />
+              <label for="minutesInput"></label>
+              <input type="number" id="minutesInput" min="0" value="5" placeholder="" onchange="updateDisplay()" />
+              <input type="number" id="secondsInput" min="0" max="59" placeholder="" onchange="updateDisplay()" />
           </div>
           <div class="setting">
-              <label for="customText">Zusätzlicher Text:</label>
-              <input type="text" id="customText" value="gleich gehts weiter..." placeholder="Zusätzlicher Text" onchange="updateDisplay()" />
+              <label for="customText"></label>
+              <input type="text" id="customText" placeholder="" onchange="updateDisplay()" />
           </div>
           <div class="setting">
-              <label for="bgColor">Hintergrundfarbe:</label>
-              <input type="color" id="bgColor" value="#282c34" onchange="updateDisplay()" />
+              <label></label>
+              <div class="color-settings">
+                  <div class="color-inputs">
+                      <input type="color" id="bgColor" value="#282c34" onchange="updateDisplay()" title="Hintergrundfarbe" />
+                      <input type="color" id="textColor" value="#cdcdcd" onchange="updateDisplay()" title="Schriftfarbe" />
+                  </div>
+                  <div class="theme-previews">
+                      <button class="theme-preview" onclick="applyTheme('rgb(186, 189, 182)', 'rgb(117, 80, 123)')" style="background-color: rgb(186, 189, 182); color: rgb(117, 80, 123);">
+                          <div class="preview-text">Text</div>
+                          <div class="preview-time">00:00</div>
+                      </button>
+                      <button class="theme-preview" onclick="applyTheme('rgb(92, 53, 102)', 'rgb(252, 175, 62)')" style="background-color: rgb(92, 53, 102); color: rgb(252, 175, 62);">
+                          <div class="preview-text">Text</div>
+                          <div class="preview-time">00:00</div>
+                      </button>
+                      <button class="theme-preview" onclick="applyTheme('rgb(243, 243, 243)', 'rgb(114, 159, 207)')" style="background-color: rgb(243, 243, 243); color: rgb(114, 159, 207);">
+                          <div class="preview-text">Text</div>
+                          <div class="preview-time">00:00</div>
+                      </button>
+                      <button class="theme-preview" onclick="applyTheme('rgb(62, 66, 128)', 'rgb(233, 207, 28)')" style="background-color: rgb(62, 66, 128); color: rgb(233, 207, 28);">
+                          <div class="preview-text">Text</div>
+                          <div class="preview-time">00:00</div>
+                      </button>
+                  </div>
+              </div>
           </div>
           <div class="setting">
-              <label for="textColor">Schriftfarbe:</label>
-              <input type="color" id="textColor" value="#cdcdcd" onchange="updateDisplay()" />
+              <label for="animationSelect"></label>
+              <select id="animationSelect" onchange="updateAnimation()">
+                  <option value="none">None</option>
+                  <option value="flicker">Flicker Gradient</option>
+                  <option value="gradient">Gradient Wave</option>
+                  <option value="blob">Blob Gradient</option>
+              </select>
           </div>
           <div class="setting">
-              <label for="fontSize">Schriftgröße:</label>
-              <input type="number" id="fontSize" value="200" placeholder="Schriftgröße" onchange="updateDisplay()" />
+              <label for="fontSize"></label>
+              <input type="number" id="fontSize" value="200" placeholder="" onchange="updateDisplay()" />
           </div>
+      </div>
+      <div class="github-link">
+          <a href="https://github.com/MaggusK/WebTimer/" target="_blank" rel="noopener noreferrer">WebTimer on GitHub</a> | GPL-3.0
       </div>
     </div>
+
+    <div id="progressBar"></div>
 
     <script>
         let timer;
         let timeLeft;
+        let totalTime;
         let isRunning = false;
         let isPaused = false;
 
+        // language recognition
+        const lang = navigator.language.startsWith('de') ? 'de' : 'en';
+
+        const translations = {
+            de: {
+                start: 'Start',
+                pause: 'Pause',
+                continue: 'Weiter',
+                reset: 'Zurücksetzen',
+                timeLabel: 'Zeit (Min/Sek):',
+                minPlaceholder: 'Min',
+                secPlaceholder: 'Sek',
+                textLabel: 'Zusätzlicher Text:',
+                textPlaceholder: 'Zusätzlicher Text',
+                defaultText: 'gleich gehts weiter...',
+                colorsLabel: 'Farben:',
+                bgColorTitle: 'Hintergrundfarbe',
+                textColorTitle: 'Schriftfarbe',
+                animationLabel: 'Animation:',
+                animationNone: 'Keine',
+                animationFlicker: 'Flicker Gradient',
+                animationGradient: 'Gradient Welle',
+                animationBlob: 'Blob Gradient',
+                fontSizeLabel: 'Schriftgröße:',
+                fontSizePlaceholder: 'Schriftgröße'
+            },
+            en: {
+                start: 'Start',
+                pause: 'Pause',
+                continue: 'Continue',
+                reset: 'Reset',
+                timeLabel: 'Time (Min/Sec):',
+                minPlaceholder: 'Min',
+                secPlaceholder: 'Sec',
+                textLabel: 'Additional Text:',
+                textPlaceholder: 'Additional Text',
+                defaultText: 'be right back...',
+                colorsLabel: 'Colors:',
+                bgColorTitle: 'Background Color',
+                textColorTitle: 'Text Color',
+                animationLabel: 'Animation:',
+                animationNone: 'None',
+                animationFlicker: 'Flicker Gradient',
+                animationGradient: 'Gradient Wave',
+                animationBlob: 'Blob Gradient',
+                fontSizeLabel: 'Font Size:',
+                fontSizePlaceholder: 'Font Size'
+            }
+        };
+
+        const t = translations[lang];
+
         const controlBox = document.getElementById('control-box');
         const pauseButton = document.getElementById('pause-button');
+        const progressBar = document.getElementById('progressBar');
+        const timerText = document.getElementById('timerText');
+        const additionalText = document.getElementById('additionalText');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const minutesInput = document.getElementById('minutesInput');
+        const secondsInput = document.getElementById('secondsInput');
+        const customText = document.getElementById('customText');
+        const bgColor = document.getElementById('bgColor');
+        const textColor = document.getElementById('textColor');
+        const fontSizeInput = document.getElementById('fontSize');
+        const themePreviews = document.querySelectorAll('.theme-preview');
+        const backgroundAnimation = document.getElementById('backgroundAnimation');
+        const animationSelect = document.getElementById('animationSelect');
 
-        // Zeige die Bedienelemente und Einstellungen bei Mouseover
+        // Show controls and settings on mouseover
         controlBox.addEventListener('mouseover', () => {
             controlBox.classList.add('visible');
         });
 
-        // Verstecke die Bedienelemente und Einstellungen bei Mouseleave
+        // Hide controls and settings on mouseleave
         controlBox.addEventListener('mouseleave', () => {
             if (isRunning) {
                 controlBox.classList.remove('visible');
@@ -240,17 +544,18 @@
         function startTimer() {
             if (isRunning) return;
 
-            const minutes = parseInt(document.getElementById('minutesInput').value) || 0;
-            const seconds = parseInt(document.getElementById('secondsInput').value) || 0;
-            const totalTime = (minutes * 60) + seconds;
-            
+            const minutes = parseInt(minutesInput.value) || 0;
+            const seconds = parseInt(secondsInput.value) || 0;
+            totalTime = (minutes * 60) + seconds;
+
             if (totalTime <= 0) return;
 
-            timeLeft = totalTime; 
+            timeLeft = totalTime;
 
             isRunning = true;
             isPaused = false;
-            pauseButton.textContent = 'Pause';
+            pauseButton.textContent = t.pause;
+            progressBar.classList.add('active');
             updateDisplay();
 
             timer = setInterval(() => {
@@ -260,19 +565,15 @@
                     if (timeLeft <= 0) {
                         clearInterval(timer);
                         document.body.classList.add('fade-out');
+                        progressBar.classList.remove('active');
                     }
                 }
             }, 1000);
         }
 
         function pauseTimer() {
-            if (isPaused) {
-                isPaused = false;
-                pauseButton.textContent = 'Pause';
-            } else {
-                isPaused = true;
-                pauseButton.textContent = 'Weiter';
-            }
+            isPaused = !isPaused;
+            pauseButton.textContent = isPaused ? t.continue : t.pause;
         }
 
         function resetTimer() {
@@ -280,56 +581,217 @@
             isRunning = false;
             isPaused = false;
             timeLeft = 0;
-            pauseButton.textContent = 'Pause';
+            pauseButton.textContent = t.pause;
+            progressBar.classList.remove('active');
+            progressBar.style.width = '100%';
             updateDisplay();
             document.body.classList.remove('fade-out');
             controlBox.classList.add('visible');
         }
 
         function updateDisplay() {
-            // Zeige die verbleibende Zeit an, wenn der Timer läuft
+            // Show remaining time when timer is running
             if (isRunning) {
                 const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
                 const seconds = String(timeLeft % 60).padStart(2, '0');
-                document.getElementById('timerText').textContent = `${minutes}:${seconds}`;
+                timerText.textContent = `${minutes}:${seconds}`;
             } else {
-                // Wenn der Timer nicht läuft, zeige die Zeit aus den Inputs an
-                const inputMinutes = parseInt(document.getElementById('minutesInput').value) || 0;
-                const inputSeconds = parseInt(document.getElementById('secondsInput').value) || 0;
+                // When timer is not running, show time from inputs
+                const inputMinutes = parseInt(minutesInput.value) || 0;
+                const inputSeconds = parseInt(secondsInput.value) || 0;
                 const displayMinutes = String(inputMinutes).padStart(2, '0');
                 const displaySeconds = String(inputSeconds).padStart(2, '0');
-                document.getElementById('timerText').textContent = `${displayMinutes}:${displaySeconds}`;
+                timerText.textContent = `${displayMinutes}:${displaySeconds}`;
             }
 
-            document.getElementById('additionalText').textContent = document.getElementById('customText').value;
+            additionalText.textContent = customText.value;
 
-            // Setze die Schriftgröße basierend auf dem Input, aber responsive
-            const fontSize = parseInt(document.getElementById('fontSize').value) || 150;
+            // Save settings to LocalStorage
+            saveSettings();
+
+            // Set font size based on input, but responsive
+            const fontSize = parseInt(fontSizeInput.value) || 150;
             const viewportFactor = Math.min(window.innerHeight, window.innerWidth) / 1000;
 
-            // Timer-Schriftgröße: Benutzerwert * viewport-Faktor mit Grenzen
+            // Timer font size: user value * viewport factor with limits
             const timerSize = Math.max(40, Math.min(fontSize * viewportFactor, window.innerHeight * 0.3));
-            document.getElementById('timerDisplay').style.fontSize = timerSize + 'px';
+            timerDisplay.style.fontSize = timerSize + 'px';
 
-            // Zusatztext-Schriftgröße: Hälfte der Timer-Größe
+            // Additional text font size: half of timer size
             const textSize = Math.max(16, Math.min(timerSize / 2, window.innerHeight * 0.15));
-            document.getElementById('additionalText').style.fontSize = textSize + 'px';
+            additionalText.style.fontSize = textSize + 'px';
 
-            // Setze die Farben
-            document.body.style.backgroundColor = document.getElementById('bgColor').value;
-            document.body.style.color = document.getElementById('textColor').value;
+            // Set colors
+            const bgColorValue = bgColor.value;
+            const textColorValue = textColor.value;
+            document.body.style.backgroundColor = bgColorValue;
+            document.body.style.color = textColorValue;
+            progressBar.style.color = textColorValue;
+
+            // Update progress bar
+            if (isRunning && totalTime > 0) {
+                progressBar.style.width = (timeLeft / totalTime) * 100 + '%';
+            }
+
+            // Update theme preview buttons
+            updateThemePreviews();
         }
 
-        // Zeige die Bedienelemente beim Laden der Seite an
+        function updateThemePreviews() {
+            const previewText = customText.value || 'Text';
+            const inputMinutes = parseInt(minutesInput.value) || 0;
+            const inputSeconds = parseInt(secondsInput.value) || 0;
+            const previewTime = `${String(inputMinutes).padStart(2, '0')}:${String(inputSeconds).padStart(2, '0')}`;
+
+            themePreviews.forEach(preview => {
+                preview.querySelector('.preview-text').textContent = previewText;
+                preview.querySelector('.preview-time').textContent = previewTime;
+            });
+        }
+
+        function applyTheme(backgroundColor, textColorValue) {
+            // Convert RGB to Hex for color inputs
+            bgColor.value = rgbToHex(backgroundColor);
+            textColor.value = rgbToHex(textColorValue);
+            updateDisplay();
+        }
+
+        function rgbToHex(rgb) {
+            const match = rgb.match(/\d+/g);
+            if (!match) return '#000000';
+            const r = parseInt(match[0]);
+            const g = parseInt(match[1]);
+            const b = parseInt(match[2]);
+            return '#' + [r, g, b].map(x => {
+                const hex = x.toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+
+        function updateAnimation() {
+            const animation = animationSelect.value;
+
+            // Remove all animation classes and clear content
+            backgroundAnimation.className = '';
+            backgroundAnimation.innerHTML = '';
+
+            // Add selected animation class
+            if (animation !== 'none') {
+                backgroundAnimation.classList.add('active');
+                backgroundAnimation.classList.add('anim-' + animation);
+
+                // Add gradient div for blob animation
+                if (animation === 'blob') {
+                    const gradientDiv = document.createElement('div');
+                    gradientDiv.className = 'gradient';
+                    backgroundAnimation.appendChild(gradientDiv);
+                }
+            }
+
+            saveSettings();
+        }
+
+        function saveSettings() {
+            const settings = {
+                minutes: minutesInput.value,
+                seconds: secondsInput.value,
+                customText: customText.value,
+                bgColor: bgColor.value,
+                textColor: textColor.value,
+                fontSize: fontSizeInput.value,
+                animation: animationSelect.value
+            };
+            localStorage.setItem('webtimerSettings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('webtimerSettings');
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    minutesInput.value = settings.minutes || 5;
+                    secondsInput.value = settings.seconds || '';
+                    customText.value = settings.customText || t.defaultText;
+                    bgColor.value = settings.bgColor || '#282c34';
+                    textColor.value = settings.textColor || '#cdcdcd';
+                    fontSizeInput.value = settings.fontSize || 200;
+                    animationSelect.value = settings.animation || 'none';
+                } catch (e) {
+                    console.error('Error loading settings:', e);
+                }
+            }
+        }
+
+        function initializeTexts() {
+            // Set button texts
+            document.querySelector('button[onclick="startTimer()"]').textContent = t.start;
+            pauseButton.textContent = t.pause;
+            document.querySelector('button[onclick="resetTimer()"]').textContent = t.reset;
+
+            // Set labels
+            const labels = document.querySelectorAll('.setting label');
+            labels[0].textContent = t.timeLabel;
+            labels[1].textContent = t.textLabel;
+            labels[2].textContent = t.colorsLabel;
+            labels[3].textContent = t.animationLabel;
+            labels[4].textContent = t.fontSizeLabel;
+
+            // Set placeholders and tooltips
+            minutesInput.placeholder = t.minPlaceholder;
+            secondsInput.placeholder = t.secPlaceholder;
+            customText.placeholder = t.textPlaceholder;
+            bgColor.title = t.bgColorTitle;
+            textColor.title = t.textColorTitle;
+            fontSizeInput.placeholder = t.fontSizePlaceholder;
+
+            // Set animation options
+            const options = animationSelect.querySelectorAll('option');
+            options[0].textContent = t.animationNone;
+            options[1].textContent = t.animationFlicker;
+            options[2].textContent = t.animationGradient;
+            options[3].textContent = t.animationBlob;
+
+            // Set default text if none set and no saved settings
+            if (!localStorage.getItem('webtimerSettings')) {
+                customText.value = t.defaultText;
+            }
+        }
+
+        // Show controls when page loads
         document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            initializeTexts();
+            updateAnimation();
             controlBox.classList.add('visible');
             updateDisplay();
         });
 
-        // Aktualisiere die Anzeige bei Fenstergrößenänderung
+        // Update display on window resize
         window.addEventListener('resize', () => {
             updateDisplay();
         });
+
+        // Mouse wheel support for minutes, seconds and font size
+        function addWheelSupport(inputElement, min = 0, max = null) {
+            inputElement.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const currentValue = parseInt(inputElement.value) || 0;
+                const delta = e.deltaY > 0 ? -1 : 1; // Scroll down = less, scroll up = more
+                let newValue = currentValue + delta;
+
+                // Check min/max limits
+                if (newValue < min) newValue = min;
+                if (max !== null && newValue > max) newValue = max;
+
+                inputElement.value = newValue;
+                updateDisplay();
+            });
+        }
+
+        // Add mouse wheel support to input fields
+        addWheelSupport(minutesInput, 0);
+        addWheelSupport(secondsInput, 0, 59);
+        addWheelSupport(fontSizeInput, 10);
     </script>
 </body>
 </html>
